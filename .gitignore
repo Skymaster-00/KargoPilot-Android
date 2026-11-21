@@ -1,0 +1,9 @@
+.gradle/
+local.properties
+**/build/
+node_modules/
+*.jks
+*.keystore
+.signing/
+artifacts/qa/
+app-release-unsigned.apk

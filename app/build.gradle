@@ -1,0 +1,34 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.kargopilot.app'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+    defaultConfig {
+        applicationId 'com.kargopilot.app'
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+    }
+    def localSigning = new Properties()
+    def signingPropertiesFile = rootProject.file('.signing/signing.properties')
+    if (signingPropertiesFile.exists()) signingPropertiesFile.withInputStream { localSigning.load(it) }
+    def signingPath = System.getenv('KP_STORE_FILE') ?: localSigning.getProperty('storeFile')
+    if (signingPath) {
+        signingConfigs {
+            release {
+                storeFile rootProject.file(signingPath)
+                storePassword System.getenv('KP_STORE_PASSWORD') ?: localSigning.getProperty('storePassword')
+                keyAlias 'kargopilot'
+                keyPassword System.getenv('KP_STORE_PASSWORD') ?: localSigning.getProperty('storePassword')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (signingPath) signingConfig signingConfigs.release
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "kargopilot-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KargoPilot Android application UI and workflow verification",
+  "scripts": {
+    "test": "node tests/app.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

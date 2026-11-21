@@ -1,0 +1,12 @@
+# Değişiklikler
+
+## 1.0.0 — 2026-11-21
+
+- Türkçe, çevrimdışı çalışan gönderi düzenleme arayüzü.
+- Türkiye ve dünyadan 35 firma, 17TRACK seçeneği ve özel HTTPS firma bağlantıları.
+- Takip numarası kopyalama ve resmî sorgulama sayfasını tarayıcıda açma.
+- Gönderi adları, notlar, düzenleme, arşiv ve kullanıcının teslim işareti.
+- Firma arama, favoriler, JSON yedekleme ve geri yükleme.
+- İmzalı Android APK ve etiketlerle GitHub Releases yayımlama iş akışı.
+
+Bu sürüm taşıyıcı API’lerinden canlı durum almaz ve otomatik bildirim göndermez.
