@@ -51,7 +51,7 @@ jobs:
           KP_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleRelease :app:lintRelease --console=plain
+          ./gradlew :app:assembleRelease :app:lintRelease :app:testReleaseUnitTest --console=plain
       - name: Verify APK signature and prepare download
         run: |
           mkdir -p dist

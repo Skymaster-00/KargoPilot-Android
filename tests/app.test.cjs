@@ -36,7 +36,7 @@ const localChrome = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || [
     const name=decodeURIComponent(url.pathname).slice(1)||'index.html';
     const file=path.join(assets,name);
     if(!file.startsWith(assets+path.sep)) return route.abort();
-    const type=name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':name.endsWith('.ttf')?'font/ttf':'text/html';
+    const type=name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':name.endsWith('.ttf')?'font/ttf':name.endsWith('.png')?'image/png':'text/html';
     await route.fulfill({path:file,contentType:type});
   });
   await page.goto('https://kargopilot.local/index.html');

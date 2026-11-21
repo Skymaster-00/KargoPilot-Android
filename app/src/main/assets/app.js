@@ -24,7 +24,7 @@ const e = escapeHTML;
 const fold = value => String(value).toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i');
 const app = document.querySelector('#app');
 const modalRoot = document.querySelector('#modal-root');
-const fresh = () => ({version:1,shipments:[],custom:[],favorites:['yurtici','aras','mng','ptt','hepsijet','trendyol']});
+const fresh = () => ({version:1,shipments:[],custom:[],favorites:['yurtici','aras','mng','ptt','hepsijet','trendyol'],preferences:{theme:'system'}});
 let state = fresh(), page = 'home', filter = 'active', region = 'all', query = '', modal = null, toastTimer, focusReturn;
 function validURL(value) {
  try { const u = new URL(value.replaceAll('{num}','12345')); return u.protocol === 'https:' && !!u.hostname && !u.username && !u.password && u.port === '' && u.hostname.includes('.'); } catch { return false; }
@@ -40,9 +40,11 @@ function validateBackup(raw) {
  const shipments = raw.shipments.map(s=>{
   if (!s || typeof s.id !=='string' || !/^[a-zA-Z0-9-]{1,100}$/.test(s.id) || recordIds.has(s.id) || !ids.has(s.carrier) || typeof s.number!=='string' || !/^[a-zA-Z0-9-]{5,60}$/.test(s.number) || typeof s.name!=='string' || !s.name.trim() || s.name.length>80 || typeof s.note!=='string' || s.note.length>1000 || !Number.isFinite(s.created) || s.created < 0 || s.created > 8640000000000000 || !['saved','delivered'].includes(s.status) || typeof s.archived!=='boolean') throw Error('Geçersiz gönderi bilgisi.');
   const key=s.carrier+'|'+s.number.toUpperCase(); if(keys.has(key)) throw Error('Yedekte yinelenen gönderi var.'); keys.add(key); recordIds.add(s.id);
-  return {id:s.id,carrier:s.carrier,number:s.number,name:s.name.trim(),note:s.note,created:s.created,status:s.status,archived:s.archived,deliveredAt:s.status==='delivered' && Number.isFinite(s.deliveredAt) && s.deliveredAt>=0 && s.deliveredAt<=8640000000000000 ? s.deliveredAt : null};
+  const postalCode=typeof s.postalCode==='string'&&/^[A-Za-z0-9 -]{0,20}$/.test(s.postalCode)?s.postalCode:'';
+  const phoneLast4=typeof s.phoneLast4==='string'&&/^(?:\d{4})?$/.test(s.phoneLast4)?s.phoneLast4:'';
+  return {id:s.id,carrier:s.carrier,number:s.number,name:s.name.trim(),note:s.note,created:s.created,status:s.status,archived:s.archived,postalCode,phoneLast4,deliveredAt:s.status==='delivered' && Number.isFinite(s.deliveredAt) && s.deliveredAt>=0 && s.deliveredAt<=8640000000000000 ? s.deliveredAt : null};
  });
- return {version:1,shipments,custom,favorites:[...new Set(raw.favorites.filter(id=>ids.has(id)))]};
+ return {version:1,shipments,custom,favorites:[...new Set(raw.favorites.filter(id=>ids.has(id)))],preferences:{theme:['system','light','dark'].includes(raw.preferences?.theme)?raw.preferences.theme:'system'}};
 }
 try { const raw = window.Native ? Native.read() : localStorage.getItem('kargopilot'); if(raw) state = validateBackup(JSON.parse(raw)); } catch { setTimeout(()=>toast('Kayıtlar okunamadı. Varsa yedeğinizi içe aktarabilirsiniz.'),700); }
 function commit(next) {
@@ -54,15 +56,16 @@ const carrierById = id => allCarriers().find(c=>c.id===id);
 const shipmentById = id => state.shipments.find(s=>s.id===id);
 const uid = prefix => prefix+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
 const date = time => new Intl.DateTimeFormat('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(time);
-const mark = c => `<span class="carrier-mark" style="--brand:${c.color}">${e(c.mark)}</span>`;
+const mark = c => window.BRAND_ASSETS?.[c.id]?`<span class="carrier-mark carrier-logo" data-brand="${e(c.id)}"><img src="${e(window.BRAND_ASSETS[c.id].file)}" alt="${e(c.name)} logosu" width="90" height="44"></span>`:`<span class="carrier-mark" style="--brand:${c.color}" title="Doğrulanmış logo bulunamadı">${e(c.mark)}</span>`;
+function shipmentDelivered(s){return s.status==='delivered'||(window.liveCache?.[s.id]?.identity===[s.carrier,s.number,s.postalCode||'',s.phoneLast4||''].join('|')&&window.liveCache[s.id].status==='Delivered');}
 function toast(text) { const t=document.querySelector('#toast'); t.textContent=text; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3300); }
 const parcelArt = `<svg class="empty-art" viewBox="0 0 120 104" aria-hidden="true"><ellipse cx="60" cy="91" rx="44" ry="7" fill="#edf2e4" stroke="none"/><path d="M23 36 60 17l37 19v40L60 96 23 76Z" fill="#e5eecf" stroke="#a9bc8e"/><path d="m23 36 37 20 37-20M60 56v40M42 26l37 20v16" stroke="#89a875"/><path d="m29 15-4-6m69 11 7-3M12 57H5" stroke="#d4a36b"/><circle cx="103" cy="67" r="4" fill="#f5cc9b" stroke="none"/></svg>`;
 function header() { return `<header class="topbar"><div class="brand"><div class="brand-logo">${icon('box')}</div><div><div class="brand-name">KargoPilot<span style="color:#7ca768">.</span></div><div class="brand-sub">PAKETİNİN PEŞİNDE</div></div></div><button class="icon-btn" data-action="add" aria-label="Yeni gönderi ekle">${icon('plus')}</button></header>`; }
 function nav() { return `<nav class="bottom-nav" aria-label="Ana menü">${[['home','box','Gönderiler'],['carriers','globe','Firmalar'],['settings','settings','Ayarlar']].map(([id,i,label])=>`<button class="nav-item ${page===id?'active':''}" data-action="nav" data-id="${id}" ${page===id?'aria-current="page"':''}>${icon(i)}<span>${label}</span></button>`).join('')}</nav>`; }
 function render() { app.innerHTML=`<main class="page">${header()}${page==='home'?home():page==='carriers'?carriersPage():settingsPage()}</main>${nav()}`; }
 function home() {
- const active=state.shipments.filter(s=>!s.archived&&s.status!=='delivered').length;
- const delivered=state.shipments.filter(s=>s.status==='delivered').length;
+ const active=state.shipments.filter(s=>!s.archived&&!shipmentDelivered(s)).length;
+ const delivered=state.shipments.filter(shipmentDelivered).length;
  return `<section class="hero"><div class="hero-text"><div class="eyebrow"><span class="dot"></span> HER PAKET, TEK YERDE</div><h1>Kargoların,<br>kontrolün altında.</h1><p>Farklı firmalar, farklı paketler.<br>Hepsinin adresi tek bir yer.</p></div><svg class="hero-art" viewBox="0 0 140 160" aria-hidden="true"><path d="M20 20c75-40 115 50 60 55s-80 55 15 66" stroke="#679b7e" stroke-dasharray="5 6"/><circle cx="100" cy="140" r="5" fill="#edab6d" stroke="none"/><path class="parcel" d="m31 62 39-21 39 21v43l-39 22-39-22Z"/><path d="m31 62 39 22 39-22M70 84v43M50 52l39 22v17" stroke="#7c9b5b"/><path d="m41 92 14 8m-14-2 8 5" stroke="#94ac74"/></svg><button class="btn" data-action="add">${icon('plus')} Gönderi ekle ${icon('arrow')}</button></section>
  <section class="stats" aria-label="Gönderi özeti"><div class="stat"><div class="stat-icon">${icon('truck')}</div><div><b>${active}</b><span>Takip ettiğin</span></div></div><div class="stat"><div class="stat-icon">${icon('check')}</div><div><b>${delivered}</b><span>Teslim aldığın</span></div></div></section>
  <div class="section-head"><h2>Gönderilerim</h2><button class="text-btn" data-action="add">+ Yeni ekle</button></div>
@@ -87,7 +90,7 @@ function settingsPage() { return `<section class="page-heading"><h1>Tamamen seni
  <section class="settings-card"><h3>${icon('download')} Yedekle ve geri yükle</h3><p>${state.shipments.length} gönderi · ${state.custom.length} özel firma. Kayıtlarını JSON dosyasına aktar; başka bir cihazda geri yükle. Yedek dosyası takip numaralarını içerir.</p><div class="settings-actions"><button class="btn secondary" data-action="export">${icon('download')} Dışa aktar</button><button class="btn ghost" data-action="import">${icon('upload')} İçe aktar</button></div></section>
  <section class="settings-card"><h3>${icon('info')} Takip nasıl çalışır?</h3><p>“Sorgula” butonu takip numaranı panoya kopyalar ve firmanın resmî sitesini tarayıcında açar. Numaranı yapıştırıp, istenirse güvenlik kodunu girerek güncel durumu öğrenirsin. Firma bilinmiyorsa 17TRACK kullanılabilir.</p><p>Uygulama taşıyıcılardan otomatik veri çekmez ve bildirim göndermez. “Kaydedildi” bir kargo hareketi değildir; teslim işaretini sen belirlersin. Gerçek durum, konum ve teslimat tahmini firmanın sayfasındadır.</p></section>
  <section class="settings-card"><h3>${icon('globe')} Firma kapsamı</h3><p>Türkiye ve dünyadan ${CARRIERS.length-1} firma bağlantısı, 17TRACK seçeneği ve özel firma ekleme. MNG gönderileri DHL eCommerce, Sendeo gönderileri Kolay Gelsin adı altında listelenir. Her firmanın veya numaranın sorgulanabilmesi garanti edilemez; site hizmetleri değişebilir.</p><button class="btn ghost" data-action="nav" data-id="carriers">Firma rehberini aç ${icon('arrow')}</button></section>
- <div class="version"><b>KargoPilot 1.0.2</b><br>Bağımsız bir gönderi düzenleyicisi.<br>Taşıyıcı firmalarla resmî bir bağlantısı yoktur.</div>`; }
+ <div class="version"><b>KargoPilot 1.1.0</b><br>Bağımsız bir gönderi düzenleyicisi.<br>Taşıyıcı firmalarla resmî bir bağlantısı yoktur.</div>`; }
 
 function showSheet(content) {
  if(!modalRoot.firstChild) focusReturn=document.activeElement;
@@ -99,7 +102,7 @@ const sheetHead = (title,sub='') => `<div class="sheet-head"><div><h2 id="sheet-
 function closeModal() { modal=null; modalRoot.innerHTML=''; document.body.style.overflow=''; if(focusReturn?.isConnected) focusReturn.focus(); }
 function openAdd(carrier='yurtici',edit=null,draft=null) {
  const s=edit?shipmentById(edit):null;
- modal={type:'add',edit,draft:draft||{carrier:s?.carrier||carrier,number:s?.number||'',name:s?.name||'',note:s?.note||''}};
+ modal={type:'add',edit,draft:draft||{carrier:s?.carrier||carrier,number:s?.number||'',name:s?.name||'',note:s?.note||'',postalCode:s?.postalCode||'',phoneLast4:s?.phoneLast4||''}};
  renderAdd();
 }
 function captureDraft() { if(modal?.type!=='add') return; for(const field of ['number','name','note']) modal.draft[field]=document.querySelector('#field-'+field)?.value||''; }
@@ -114,7 +117,7 @@ function saveShipment(track) {
  if(state.shipments.some(s=>s.id!==modal.edit&&s.carrier===d.carrier&&s.number.toUpperCase()===number)) { error.textContent='Bu firmadaki takip numarası zaten kayıtlı.'; return; }
  if(!modal.edit&&state.shipments.length>=1500) {toast('En fazla 1500 gönderi kaydedebilirsin.');return;}
  const old=modal.edit?shipmentById(modal.edit):null;
- const s={id:old?.id||uid('s-'),created:old?.created||Date.now(),status:old?.status||'saved',archived:old?.archived||false,deliveredAt:old?.deliveredAt||null,carrier:d.carrier,number,name:d.name.trim()||carrierById(d.carrier).name+' gönderim',note:d.note.trim()};
+ const s={id:old?.id||uid('s-'),created:old?.created||Date.now(),status:old?.status||'saved',archived:old?.archived||false,deliveredAt:old?.deliveredAt||null,carrier:d.carrier,number,name:d.name.trim()||carrierById(d.carrier).name+' gönderim',note:d.note.trim(),postalCode:d.postalCode||'',phoneLast4:d.phoneLast4||''};
  const next={...state,shipments:old?state.shipments.map(x=>x.id===s.id?s:x):[s,...state.shipments]};
  if(!commit(next))return;
  page='home';filter=s.archived?'archived':s.status==='delivered'?'delivered':'active';query='';closeModal();render();openDetail(s.id);toast(old?'Gönderi güncellendi.':'Gönderin kaydedildi.');if(track)trackShipment(s.id);

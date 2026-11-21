@@ -1,5 +1,17 @@
 # Değişiklikler
 
+## 1.1.0 — 2026-11-22
+
+- Kalıcı açık / koyu / sistem teması ve uyumlu Android sistem çubukları.
+- 17TRACK kayıt / sorgu istemcisi; taşıyıcı durumu, hareket geçmişi, kaynak ve zaman bilgileri.
+- Android Keystore ile kişisel API anahtarı saklama; anahtarların yedekten ve kaynak koddan ayrılması.
+- Android bildirim kanalı, izin akışı, test bildirimi ve 6 saatlik JobScheduler kontrolü; değişmeyen hareketler için tekrar bildirim engeli.
+- Koordinat sağlanan hareketlerin OpenStreetMap haritası; koordinat yoksa açık boş durum.
+- 31 kaynaklı PNG marka görseli, isteğe bağlı ek sorgu alanları ve eski yedek uyumluluğu.
+- 9 Java birim testi; açık/koyu tema, harita ve servis hata durumları için arayüz testleri.
+
+Gerçek taşıyıcı testi API hesabı sağlanamadığından doğrulanmadı; sentetik yanıt testleri gerçek gönderi sonucu olarak sunulmaz.
+
 ## 1.0.2 — 2026-11-21
 
 - GitHub Android SDK kurulumu artık kaldırılan eski `tools` paketini istemiyor; yalnızca gerekli platform araçlarını kuruyor.

@@ -1,6 +1,7 @@
 plugins { id 'com.android.application' }
 
 android {
+    buildFeatures { buildConfig true }
     namespace 'com.kargopilot.app'
     compileSdk 35
     buildToolsVersion '35.0.0'
@@ -8,8 +9,8 @@ android {
         applicationId 'com.kargopilot.app'
         minSdk 23
         targetSdk 34
-        versionCode 3
-        versionName '1.0.2'
+        versionCode 4
+        versionName '1.1.0'
     }
     def localSigning = new Properties()
     def signingPropertiesFile = rootProject.file('.signing/signing.properties')
@@ -31,4 +32,9 @@ android {
             if (signingPath) signingConfig signingConfigs.release
         }
     }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
 }

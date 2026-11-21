@@ -13,6 +13,8 @@ build=build.replace(/versionName '[^']+'/,`versionName '${version}'`).replace(/v
 fs.writeFileSync(buildFile,build);
 const appFile=path.join(root,'app/src/main/assets/app.js');
 fs.writeFileSync(appFile,fs.readFileSync(appFile,'utf8').replace(`KargoPilot ${old}`,`KargoPilot ${version}`));
+const featureFile=path.join(root,'app/src/main/assets/features.js');
+if(fs.existsSync(featureFile))fs.writeFileSync(featureFile,fs.readFileSync(featureFile,'utf8').replaceAll(`KargoPilot ${old}`,`KargoPilot ${version}`));
 const pkgFile=path.join(root,'package.json');
 const pkg=JSON.parse(fs.readFileSync(pkgFile,'utf8'));pkg.version=version;fs.writeFileSync(pkgFile,JSON.stringify(pkg,null,2)+'\n');
 const lockFile=path.join(root,'package-lock.json');

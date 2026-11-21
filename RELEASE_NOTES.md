@@ -1,14 +1,14 @@
-KargoPilot 1.0.2 — imzalı Android APK.
+KargoPilot 1.1.0 — koyu tema, hareket ekranı, bildirim altyapısı ve harita.
 
-Bu sürümde GitHub yayımlama ortamının SDK kurulumu düzeltildi. Netlog ve CEVA / Borusan bağlantıları günceldir. Kargomsende’nin güncel resmî adresi doğrulanamadığı için bu seçim açıkça belirtilen 17TRACK alternatifini kullanır; sonuç bulunamayabilir. SMS ile gelen güncel bağlantı özel firma olarak eklenebilir.
+- Açık / koyu / sistem teması; seçim kalıcıdır.
+- Kişisel 17TRACK API anahtarıyla durum ve hareket geçmişi. Anahtar cihazda Android Keystore ile şifrelenir; APK’ya, GitHub’a veya yedeğe konmaz.
+- Android bildirim izni, test bildirimi ve yaklaşık 6 saatte bir dönüşümlü arka plan kontrolü. Yeni durum/hareket tekrar bildirilmez.
+- OpenStreetMap üzerinde sağlayıcının gönderdiği hareket koordinatları; koordinat yoksa boş durum ve isteğe bağlı yer adı araması. Anlık kurye GPS’i değildir.
+- 31 gerçek PNG marka görseli. 21 görselin en uzun kenarı en az 512 piksel; diğerleri büyütülmemiş orijinal çözünürlüktedir. Görseli doğrulanamayan firmalarda harf simgesi vardır.
+- İsteğe bağlı posta kodu ve telefon son 4 hane alanları, eski kayıt/yedek uyumluluğu ve hata halinde son hareketin korunması.
 
-- 35 firma bağlantısı, 17TRACK sorgulaması ve listede olmayan firmalar için özel bağlantı ekleme.
-- Takip numarası kaydetme, kopyalama ve firmanın resmî sayfasında sorgulama.
-- Gönderi adları, notlar, arşiv, favoriler ve JSON yedekleme.
-- Türkçe arayüz; kayıtlar cihazda saklanır.
+**API hesabı olmadan:** Gönderi kaydı ve resmî sitede sorgulama çalışır. Otomatik hareket sorgusu ve ona bağlı durum bildirimleri için desteklenen firma ve uygun kotaya sahip kişisel 17TRACK hesabı gerekir.
 
-**İndir:** `KargoPilot.apk`. Android 6.0 veya üzeri ve güncel Android System WebView gerekir. İmzalı APK, sonraki sürümlerde aynı anahtarla güncellenir.
+**Doğrulama:** 9 Java birim testi, arayüz iş akışları, iki tema × dört ekran genişliği, Android derlemesi, lint ve APK imza kontrolü. Arayüz canlı hareket testleri sentetik yanıtlarla yapıldı. API hesabı/anahtarı olmadığı için gerçek gönderinin hareketleri doğrulanamadı. Uygun emülatör olmadığından gerçek cihazda bildirim, izin istemi ve Keystore çalışma zamanı test edilmedi.
 
-**Kapsam:** Güncel kargo durumu firmanın tarayıcıda açılan sayfasında gösterilir. Uygulama içinde otomatik canlı durum, hareket güncellemesi veya bildirim yoktur. Her firma ve takip numarası için sonuç garantisi yoktur.
-
-**Doğrulama:** Arayüz işlevleri 320, 390, 412 ve 768 piksel genişliklerde Chromium ile test edildi. Android derleme ve imza kontrolü yapıldı. Cihaz aracı uygun emülatör sunmadığından gerçek cihaz/emülatör çalıştırma testi yapılmadı.
+**İndir:** `KargoPilot.apk` · Android 6.0+ ve güncel Android System WebView. Mevcut uygulama aynı imza anahtarıyla güncellenebilir.
