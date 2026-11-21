@@ -4,7 +4,7 @@ Türkçe kargo takip uygulaması: koyu/açık tema, yerel gönderi kayıtları, 
 
 [En son APK’yı indir](https://github.com/Skymaster-00/KargoPilot-Android/releases/latest/download/KargoPilot.apk) · [Sürümler](https://github.com/Skymaster-00/KargoPilot-Android/releases) · [Derleme iş akışı](https://github.com/Skymaster-00/KargoPilot-Android/actions)
 
-## 1.1.0 özellikleri
+## Uygulama özellikleri
 
 - Kalıcı açık, koyu ve sistem teması; Android sistem çubuklarıyla uyum.
 - 35 firma seçeneği, 17TRACK alternatifi ve özel HTTPS takip bağlantıları.
@@ -12,7 +12,7 @@ Türkçe kargo takip uygulaması: koyu/açık tema, yerel gönderi kayıtları, 
 - Kişisel 17TRACK API anahtarıyla uygulama içinde taşıyıcı durumu ve hareket geçmişi. Kaynak taşıyıcı adı, hareket zamanı ve son sorgu zamanı ayrı gösterilir. Hatalarda önceki kayıt korunur.
 - Android bildirim izni, bildirim kanalı, açıkça etiketlenen test bildirimi ve yaklaşık 6 saatte bir arka plan kontrolü. Aynı veri tekrar bildirilmez. Her çalışmada en çok 10 aktif gönderi dönüşümlü işlenir; Android pil/ağ koşulları kontrolü geciktirebilir.
 - OpenStreetMap üzerinde yalnızca servis tarafından sağlanan hareket koordinatları. Koordinat yoksa boş durum ve isteğe bağlı yer adı araması. Rastgele pin veya kurye GPS simülasyonu yoktur.
-- 31 gerçek PNG marka görseli; 18 vektör kaynaktan rasterleştirilmiş, 21 görselin en uzun kenarı en az 512 pikseldir. Küçük orijinaller büyütülmedi. Doğrulanmış görseli olmayan seçeneklerde harf simgesi kullanılır. Kaynaklar ve boyutlar: [logos/sources.json](app/src/main/assets/logos/sources.json).
+- 35 PNG marka görseli sabit boyutlu kutulara sığdırılır. Yüklenmeyen veya kaynağı doğrulanamayan görsellerin yerinde firma kısaltması görünür. [Logo kaynakları ve boyutları](app/src/main/assets/logos/sources.json)
 - Android dosya seçicisiyle JSON dışa aktarma / geri yükleme ve sistem paylaşım menüsü.
 
 ## Canlı takibin koşulları
@@ -23,7 +23,7 @@ Türkçe kargo takip uygulaması: koyu/açık tema, yerel gönderi kayıtları, 
 
 Firma kodları [17TRACK’in resmî listesi](https://res.17track.net/asset/carrier/info/apicarrier.all.json) ile eşleştirilmiştir. API desteği doğrulanmamış firmalarda açık hata ve resmî site alternatifi gösterilir. Firma bilinmiyorsa otomatik algılama denenebilir; aynı biçimdeki takip numaraları farklı firmalara ait olabildiğinden sonuçtaki taşıyıcı adı kontrol edilmelidir. Bazı firmalar için alıcı posta kodu / telefonun son 4 hanesi gerekir; bunlar gönderi formunda isteğe bağlıdır.
 
-API hesabı yoksa yerel gönderi kaydı ve resmî sorgulama sayfası özelliği kullanılabilir; otomatik hareket sorgusu ve buna bağlı bildirimler etkinleşmez. “Kaydedildi” bir kargo hareketi, “Teslim aldım” ise servis doğrulaması değildir.
+API hesabı olmadan gönderi detayındaki **Siteden takip et** bölümünü kullanabilirsin. Resmî sorgulama formuna gerektiğinde panodaki numarayı yapıştır. 17TRACK seçeneği numarayı sorgulama adresine ekler. Android, destekleyen tarayıcılarda takip sayfasını özel sekmede açar. Uygulama içindeki hareket geçmişi ve arka plan bildirimleri kişisel API hesabı gerektirir.
 
 ## Gizlilik ve harita
 

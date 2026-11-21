@@ -12,7 +12,7 @@ const seed={version:1,shipments:[{id:'test-live',carrier:'kolay',number:'TEST000
   window.calls=[];window.testCache={};window.testConnection={configured:false,notificationsEnabled:false,permissionGranted:false,backgroundScheduled:false};
   window.Native={
    read:()=>localStorage.getItem('store'),save:value=>{localStorage.setItem('store',value);return true;},
-   open:url=>calls.push(['open',url]),copy:text=>calls.push(['copy',text]),share:text=>calls.push(['share',text]),
+   open:url=>calls.push(['open',url]),openTracking:url=>calls.push(['openTracking',url]),copy:text=>calls.push(['copy',text]),share:text=>calls.push(['share',text]),
    exportBackup:json=>calls.push(['backup',json]),importBackup:()=>{},
    theme:dark=>calls.push(['theme',dark]),trackingSnapshot:()=>JSON.stringify(testCache),trackingConnection:()=>JSON.stringify(testConnection),
    setTrackingKey:key=>{testConnection.configured=!!key;calls.push(['keySaved',!!key]);return true;},
@@ -24,6 +24,14 @@ const seed={version:1,shipments:[{id:'test-live',carrier:'kolay',number:'TEST000
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));let tiles=0;
  await page.route('**/*',async route=>{const u=new URL(route.request().url());if(u.hostname==='tile.openstreetmap.org'){tiles++;return route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6uHAAAAAASUVORK5CYII=','base64')});}assert.equal(u.hostname,'kargopilot.local');let file=path.join(assets,u.pathname.slice(1)||'index.html');if(!file.startsWith(assets+path.sep))return route.abort();let ext=path.extname(file);await route.fulfill({path:file,contentType:({'.js':'application/javascript','.css':'text/css','.png':'image/png','.ttf':'font/ttf','.json':'application/json'})[ext]||'text/html'});});
  await page.goto('https://kargopilot.local/index.html');
+ await page.getByRole('button',{name:/Test gönderisi/}).click();
+ await page.getByRole('button',{name:'Resmî sitede sorgula'}).click();
+ await page.waitForFunction(()=>calls.some(([action,url])=>action==='openTracking'&&url==='https://kolaygelsin.com/tracking'));
+ assert(await page.evaluate(()=>calls.some(([action,value])=>action==='copy'&&value==='TEST000001')));
+ await page.getByRole('button',{name:'17TRACK’te numarayla sorgula'}).click();
+ assert.deepEqual(await page.evaluate(()=>calls.at(-1)),['openTracking','https://t.17track.net/tr?nums=TEST000001']);
+ assert.equal(await page.locator('#api-key').count(),0);
+ await page.getByRole('button',{name:'Kapat',exact:true}).click();
  await page.getByRole('button',{name:'Ayarlar',exact:true}).click();
  await page.getByRole('button',{name:'Koyu',exact:true}).click();
  assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
@@ -70,5 +78,21 @@ const seed={version:1,shipments:[{id:'test-live',carrier:'kolay',number:'TEST000
   for(const name of ['Gönderiler','Harita','Firmalar','Ayarlar']){await page.getByRole('button',{name,exact:true}).click();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Overflow ${theme} ${width} ${name}`);}
  }
  const logos=await page.evaluate(()=>window.BRAND_ASSETS);for(const data of Object.values(logos))assert(fs.existsSync(path.join(assets,data.file)));
+ await page.setViewportSize({width:320,height:844});
+ await page.getByRole('button',{name:'Firmalar',exact:true}).click();
+ await page.locator('[data-brand="yurtici"].logo-loaded img').waitFor();
+ await page.locator('[data-brand="trendyol"].logo-loaded img').waitFor();
+ const allContained=await page.locator('.logo-loaded img').evaluateAll(images=>images.every(image=>{
+  const tile=image.parentElement.getBoundingClientRect(), picture=image.getBoundingClientRect();
+  return image.naturalWidth>0&&picture.width<=48&&picture.height<=30&&picture.right<=tile.right&&picture.bottom<=tile.bottom;
+ }));
+ assert(allContained,'Carrier images must stay inside the tile');
+ await page.screenshot({path:path.join(out,'08-dark-carriers.png')});
+ await page.route('**/logos/kolay.png',route=>route.abort());
+ await page.reload();
+ await page.getByRole('button',{name:'Firmalar',exact:true}).click();
+ const missingLogo=page.locator('[data-brand="kolay"]');
+ await missingLogo.locator('.carrier-initials').waitFor();
+ assert.equal(await missingLogo.locator('img').isVisible(),false);
  assert.deepEqual(errors,[]);await browser.close();console.log('PASS: dark/light persistence, migration, key excluded from backups, permission-denied UI, notification bridge, real response rendering with synthetic fixtures, map coordinates/absence, retained data after errors, 8 theme/viewport combinations and local PNG logos.');
 })().catch(e=>{console.error(e);process.exit(1);});

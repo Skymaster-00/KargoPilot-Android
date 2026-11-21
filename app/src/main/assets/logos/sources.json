@@ -282,5 +282,41 @@
     "width": 48,
     "height": 48,
     "kind": "official-site-icon-cached-by-google"
+  },
+  "yurtici": {
+    "file": "logos/yurtici.png",
+    "source": "https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg",
+    "sourceFormat": "svg",
+    "sourceWidth": 178,
+    "sourceHeight": 44,
+    "width": 1024,
+    "height": 253
+  },
+  "borusan": {
+    "file": "logos/borusan.png",
+    "source": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_of_CEVA_Logistics_%282023%29.svg",
+    "sourceFormat": "svg",
+    "sourceWidth": 293,
+    "sourceHeight": 88,
+    "width": 1024,
+    "height": 308
+  },
+  "yunexpress": {
+    "file": "logos/yunexpress.png",
+    "source": "https://psyt-image.yunexpress.com/images-en/images/logo.webp",
+    "sourceFormat": "webp",
+    "sourceWidth": 342,
+    "sourceHeight": 68,
+    "width": 342,
+    "height": 68
+  },
+  "trendyol": {
+    "file": "logos/trendyol.png",
+    "source": "https://res.17track.net/asset/carrier/logo/120x120/100925.png",
+    "sourceFormat": "png",
+    "sourceWidth": 120,
+    "sourceHeight": 120,
+    "width": 120,
+    "height": 120
   }
 }

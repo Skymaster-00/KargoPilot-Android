@@ -80,11 +80,22 @@ public class MainActivity extends Activity {
     private void tell(String msg) { runOnUiThread(() -> Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()); }
 
     private void openExternal(String url) {
+        openExternal(url, false);
+    }
+
+    private void openExternal(String url, boolean trackingTab) {
         runOnUiThread(() -> {
             try {
                 Uri uri = Uri.parse(url);
                 if (!"https".equals(uri.getScheme()) || uri.getHost() == null || uri.getUserInfo() != null) { tell("Geçerli bir HTTPS adresi gerekli."); return; }
-                startActivity(new Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE));
+                Intent browser = new Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE);
+                if (trackingTab) {
+                    // Custom Tabs protocol. Browsers without support still handle ACTION_VIEW.
+                    Bundle options = new Bundle();
+                    options.putBinder("android.support.customtabs.extra.SESSION", null);
+                    browser.putExtras(options);
+                }
+                startActivity(browser);
             } catch (ActivityNotFoundException ex) { tell("Takip sayfası için bir tarayıcı yükleyin."); }
             catch (Exception ex) { tell("Bağlantı açılamadı."); }
         });
@@ -98,6 +109,7 @@ public class MainActivity extends Activity {
             catch (Exception ex) { return false; }
         }
         @JavascriptInterface public void open(String url) { openExternal(url); }
+        @JavascriptInterface public void openTracking(String url) { openExternal(url, true); }
         @JavascriptInterface public String trackingSnapshot(){return tracking.snapshots().toString();}
         @JavascriptInterface public String trackingConnection(){return tracking.connection().toString();}
         @JavascriptInterface public boolean systemDark(){return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)==Configuration.UI_MODE_NIGHT_YES;}
@@ -113,7 +125,17 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void testNotification(){runOnUiThread(()->{if(tracking.permission())tracking.testNotification();else tell("Önce bildirim iznini aç.");});}
         @JavascriptInterface public void notificationSettings(){runOnUiThread(()->{Intent intent=new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName()));startActivity(intent);});}
-        @JavascriptInterface public void theme(boolean dark){runOnUiThread(()->{web.setBackgroundColor(dark?0xFF101A17:0xFFF6F7F3);getWindow().setStatusBarColor(dark?0xFF101A17:0xFFF6F7F3);getWindow().setNavigationBarColor(dark?0xFF16231E:Build.VERSION.SDK_INT>=27?Color.WHITE:0xFF124E40);int flags=dark?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;if(!dark&&Build.VERSION.SDK_INT>=27)flags|=View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;getWindow().getDecorView().setSystemUiVisibility(flags);});}
+        @JavascriptInterface public void theme(boolean dark) {
+            runOnUiThread(() -> {
+                int background = dark ? 0xFF141518 : 0xFFF6F7F3;
+                web.setBackgroundColor(background);
+                getWindow().setStatusBarColor(background);
+                getWindow().setNavigationBarColor(dark ? 0xFF1D1F24 : Build.VERSION.SDK_INT >= 27 ? Color.WHITE : 0xFF124E40);
+                int flags = dark ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                if (!dark && Build.VERSION.SDK_INT >= 27) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            });
+        }
         @JavascriptInterface public void copy(String text) {
             runOnUiThread(() -> {
                 ClipboardManager cb = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);

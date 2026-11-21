@@ -1,5 +1,12 @@
 # Değişiklikler
 
+## 1.1.1
+
+- Firma logoları küçük ve sabit kutulara sığdırıldı. Yüklenmeyen görsellerde firma kısaltması gösteriliyor.
+- Yurtiçi Kargo, Trendyol Express, CEVA ve YunExpress logoları eklendi.
+- Koyu tema füme yüzeyler ve hafif mavi vurgularla yenilendi.
+- Gönderi detayından API hesabı olmadan resmî takip sayfasına veya numarası hazır 17TRACK sorgusuna geçilebiliyor. Kolay Gelsin bağlantısı doğrudan gönderi sorgulama formunu açıyor.
+
 ## 1.1.0 — 2026-11-22
 
 - Kalıcı açık / koyu / sistem teması ve uyumlu Android sistem çubukları.

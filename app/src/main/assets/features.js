@@ -22,7 +22,7 @@ function cleanSnapshots(raw){
  }return result;
 }
 function readNativeTracking(){try{if(nativeMethod('trackingSnapshot'))window.liveCache=cleanSnapshots(JSON.parse(Native.trackingSnapshot()));if(nativeMethod('trackingConnection'))liveConnection=JSON.parse(Native.trackingConnection());}catch{toast('Takip kayıtları okunamadı.');}}
-function applyTheme(){const preference=state.preferences?.theme||'system';const systemDark=nativeMethod('systemDark')?Native.systemDark():matchMedia('(prefers-color-scheme: dark)').matches;const dark=preference==='dark'||preference==='system'&&systemDark;document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').content=dark?'#101a17':'#f6f7f3';if(nativeMethod('theme'))Native.theme(dark);}
+function applyTheme(){const preference=state.preferences?.theme||'system';const systemDark=nativeMethod('systemDark')?Native.systemDark():matchMedia('(prefers-color-scheme: dark)').matches;const dark=preference==='dark'||preference==='system'&&systemDark;document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').content=dark?'#141518':'#f6f7f3';if(nativeMethod('theme'))Native.theme(dark);}
 function themeControls(){return `<section class="settings-card"><h3>${icon('moon')} Görünüm</h3><p>Gece için koyu, gündüz için açık. İstersen cihazının temasına uyum sağlasın.</p><div class="theme-buttons" aria-label="Tema seçimi">${[['system','Sistem'],['light','Açık'],['dark','Koyu']].map(([id,label])=>`<button class="chip ${state.preferences?.theme===id?'selected':''}" data-action="theme" data-id="${id}" aria-pressed="${state.preferences?.theme===id}">${label}</button>`).join('')}</div></section>`;}
 const oldSettingsPage=settingsPage;
 settingsPage=function(){
@@ -47,12 +47,37 @@ shipmentList=function(){
  return list.map(s=>{const c=carrierById(s.carrier),r=getLive(s),label=s.archived?'Arşivde':r?STATUS_LABELS[r.status]:s.status==='delivered'?'Teslim işaretlendi':'Kaydedildi';return `<button class="shipment" data-action="detail" data-id="${s.id}"><div class="shipment-top">${mark(c)}<div class="shipment-info"><h3>${e(s.name)}</h3><p>${e(c.name)}</p></div>${icon('chevron')}</div>${r?`<div class="shipment-live"><strong>${e(STATUS_LABELS[r.status])}</strong>${r.events[0]?' · '+e(r.events[0].location||r.events[0].description):''}${r.error?' · Son kayıt':''}</div>`:''}<div class="shipment-bottom"><span class="tracking-no">${e(s.number)}</span><span class="badge ${s.archived?'archive':shipmentDelivered(s)?'done':''}">${e(label)}</span></div></button>`;}).join('');
 };
 const originalOpenDetail=openDetail;
+function publicTrackingOptions(shipment, officialButton) {
+ const carrier = carrierById(shipment.carrier);
+ const prefilled = carrier.url.includes('{num}');
+ const uses17Track = carrier.id === 'auto' || carrier.id === 'kargomsende';
+ const section = document.createElement('section');
+ section.className = 'tracking-panel public-tracking';
+ section.innerHTML = `<h3>Siteden takip et</h3>
+  <p>${prefilled ? 'Takip numarası sorgulama sayfasına aktarılır.' : 'Takip numarası panoya kopyalanır. Açılan sayfaya yapıştırıp sorgula.'}</p>
+  <div class="tracking-links"></div>`;
+ const links = section.querySelector('.tracking-links');
+ links.append(officialButton);
+ if (!uses17Track) {
+  links.insertAdjacentHTML('beforeend', `<button class="btn ghost full" data-action="public-17track" data-id="${e(shipment.id)}">${icon('external')} 17TRACK’te numarayla sorgula</button>`);
+ }
+ return section;
+}
 openDetail=function(id){
  originalOpenDetail(id);const s=shipmentById(id);if(!s)return;const r=getLive(s),busy=refreshing.has(id);
  const content=modalRoot.querySelector('.sheet');const panel=document.createElement('section');panel.className='tracking-panel';
+ const officialButton = content.querySelector('[data-action="track"]');
+ if (officialButton.nextElementSibling?.matches('.notice')) officialButton.nextElementSibling.remove();
+ const publicPanel = publicTrackingOptions(s, officialButton);
+ const numberPanel = content.querySelector('.number-panel');
+ numberPanel.after(publicPanel);
+ if (!liveConnection.configured && !r) {
+  publicPanel.insertAdjacentHTML('afterend', `<button class="text-btn" data-action="api-setup">Otomatik takip için API hesabı bağla</button>`);
+  return;
+ }
  const last=r?.events[0];
  panel.innerHTML=`<div class="tracking-label">17TRACK · TAŞIYICI HAREKETLERİ</div><div class="tracking-status">${icon('truck')}<h3>${r?e(STATUS_LABELS[r.status]):'Henüz canlı sorgu yapılmadı'}</h3></div>${r?.providerName?`<p>Servisin belirlediği taşıyıcı: ${e(r.providerName)}</p>`:''}${last?`<p>${e(last.description)}${last.location?'<br>'+e(last.location):''}</p>`:''}${r?.syncedAt?`<div class="tracking-updated">Son sorgu: ${date(r.syncedAt)}${last?'<br>Hareket zamanı: '+eventDate(last.time):''}</div>`:''}${r?.eta?.from?`<p>Tahmini teslim: ${e(eventDate(r.eta.from))}<br>Kaynak: ${r.eta.source==='Official'?'Taşıyıcı':'17TRACK'}</p>`:''}${r?.error?`<div class="tracking-error" role="alert">${e(r.error)}</div>`:''}${r?.message?`<p>${e(r.message)}</p>`:''}<div class="tracking-toolbar"><button class="btn secondary" data-action="refresh-live" data-id="${id}" ${busy?'disabled':''}><span class="${busy?'refresh-indicator':''}">${icon('refresh')}</span>${busy?'Sorgulanıyor…':'Hareketleri yenile'}</button><button class="btn ghost" data-action="shipment-map" data-id="${id}">${icon('map')} Harita</button></div><p>${liveConnection.configured?'Taşıyıcının sisteme bildirdiği son veri gösterilir; anlık GPS değildir.':'Canlı takip için Ayarlar’dan API anahtarını bağla. Resmî sitede sorgulama anahtarsız kullanılabilir.'}</p>`;
- content.querySelector('.number-panel').after(panel);
+ numberPanel.after(panel);
  if(r){const title=content.querySelector('.detail-carrier + .badge');if(title)title.textContent=STATUS_LABELS[r.status]+' · 17TRACK';}
  if(r?.events.length){const list=document.createElement('section');list.className='movement-list';list.innerHTML=`<h3>Kargo hareketleri</h3>${r.events.map(ev=>`<div class="timeline-event"><span class="timeline-point"></span><div><b>${e(ev.description||'Hareket bilgisi')}</b><small>${e(eventDate(ev.time))}${ev.location?'<br>'+e(ev.location):''}</small></div></div>`).join('')}`;content.querySelector('.timeline').before(list);}
 };
@@ -94,6 +119,10 @@ document.addEventListener('click',event=>{
  else if(action==='notification-test'){if(nativeMethod('testNotification'))Native.testNotification();else toast('Bildirim testi Android APK içinde kullanılabilir.');}
  else if(action==='notification-settings'){if(nativeMethod('notificationSettings'))Native.notificationSettings();}
  else if(action==='refresh-live')refreshLive(id);
+ else if(action==='public-17track'){
+  const shipment=shipmentById(id);
+  if(shipment)openTrackingURL(CARRIERS[0].url.replace('{num}',encodeURIComponent(shipment.number)));
+ }
  else if(action==='shipment-map')openShipmentMap(id);
  else if(action==='location-search'){const s=shipmentById(id),location=s?getLive(s)?.events.find(ev=>ev.location)?.location:null;if(location)openURL('https://www.openstreetmap.org/search?query='+encodeURIComponent(location));}
 });

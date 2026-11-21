@@ -1,6 +1,6 @@
 // Firmaların kendi web siteleri; veri entegrasyonu veya iş ortaklığı anlamına gelmez.
 const CARRIERS = [
- ['auto','Firma bilmiyorum','17TRACK ile uluslararası sorgulama','global','17','#193d74','https://www.17track.net/tr'],
+ ['auto','Firma bilmiyorum','17TRACK ile uluslararası sorgulama','global','17','#193d74','https://t.17track.net/tr?nums={num}'],
  ['yurtici','Yurtiçi Kargo','Yurt içi gönderiler','tr','YK','#e86b21','https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula'],
  ['aras','Aras Kargo','Yurt içi ve yurt dışı','tr','AK','#ce283e','https://www.araskargo.com.tr/'],
  ['mng','DHL eCommerce','MNG Kargo gönderileri dahil','tr','DHL','#bd2026','https://www.dhlecommerce.com.tr/gonderitakip'],
@@ -8,9 +8,9 @@ const CARRIERS = [
  ['ptt','PTT Kargo','Posta, kargo ve TURPEX','tr','PTT','#9b7300','https://gonderitakip.ptt.gov.tr/'],
  ['hepsijet','HepsiJET','HepsiJET ve HepsiJET XL','tr','hJ','#e96518','https://www.hepsijet.com/'],
  ['trendyol','Trendyol Express','E-ticaret gönderileri','tr','tex','#dd6117','https://www.trendyolexpress.com/'],
- ['kolay','Kolay Gelsin','Sendeo gönderileri dahil','tr','KG','#d75a14','https://www.kolaygelsin.com/'],
+ ['kolay','Kolay Gelsin','Sendeo gönderileri dahil','tr','KG','#d75a14','https://kolaygelsin.com/tracking'],
  ['kargoist','Kargoist','Firma sitesi / SMS takip bağlantısı','tr','Ki','#cc294c','https://kargoist.com/'],
- ['kargomsende','Kargomsende','17TRACK alternatifi · sonuç bulunamayabilir','tr','KS','#773aae','https://www.17track.net/tr'],
+ ['kargomsende','Kargomsende','17TRACK alternatifi · sonuç bulunamayabilir','tr','KS','#773aae','https://t.17track.net/tr?nums={num}'],
  ['agt','AGT Kurye','Kurye ve dağıtım','tr','AGT','#e03232','https://www.agtkurye.com.tr/'],
  ['kuryenet','Kuryenet','Kart ve evrak gönderileri','tr','KN','#2372a6','https://www.kuryenet.com.tr/'],
  ['birgunde','Bir Günde Kargo','Hızlı teslimat','tr','1G','#7a3195','https://birgundekargo.com/'],

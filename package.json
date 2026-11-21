@@ -1,6 +1,6 @@
 {
   "name": "kargopilot-android",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "KargoPilot Android application UI and workflow verification",
   "scripts": {

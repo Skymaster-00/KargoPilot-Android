@@ -3,7 +3,9 @@ const fs=require('node:fs'),path=require('node:path'),sharp=require('sharp');
 const dest=path.resolve(__dirname,'../app/src/main/assets/logos');fs.mkdirSync(dest,{recursive:true});
 const sources={
  auto:'https://www.17track.net/assets/logo-full.svg',
- yurtici:'https://cdn.brandfetch.io/idBcrY2d6L/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1760552856137',
+ yurtici:'https://www.yurticikargo.com/web_files/yurtici-kargo/assets/img/logo.svg',
+ yunexpress:'https://psyt-image.yunexpress.com/images-en/images/logo.webp',
+ trendyol:'https://res.17track.net/asset/carrier/logo/120x120/100925.png',
  agt:'https://static.wixstatic.com/media/71a161_0fa9a77fe7ca43fba9d0ce79ac0dffc2~mv2_d_9274_3081_s_4_2.png',
  borusan:'https://upload.wikimedia.org/wikipedia/commons/d/d3/Logo_of_CEVA_Logistics_%282023%29.svg',
  aras:'https://www.araskargo.com.tr/aras-nav-logo.svg',
@@ -27,7 +29,6 @@ const sources={
 };
 const wiki={yurtici:'Yurtiçi Kargo',ptt:'PTT (Turkey)',agt:'AGT Kurye',borusan:'CEVA Logistics',ups:'United Parcel Service',usps:'United States Postal Service',gls:'GLS Group',laposte:'La Poste (France)',postnl:'PostNL',bpost:'Bpost',canadapost:'Canada Post',auspost:'Australia Post',swisspost:'Swiss Post',cainiao:'Cainiao',yunexpress:'YunExpress',kargomsende:'Kargomsende'};
 const manifest=fs.existsSync(path.join(dest,'sources.json'))?JSON.parse(fs.readFileSync(path.join(dest,'sources.json'),'utf8')):{};
-delete manifest.trendyol; // Group artwork is not the distinct Express carrier logo.
 async function download(id,url){
  if(manifest[id]&&process.argv[2]!=='--refresh')return;
  try{

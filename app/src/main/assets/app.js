@@ -56,7 +56,20 @@ const carrierById = id => allCarriers().find(c=>c.id===id);
 const shipmentById = id => state.shipments.find(s=>s.id===id);
 const uid = prefix => prefix+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
 const date = time => new Intl.DateTimeFormat('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(time);
-const mark = c => window.BRAND_ASSETS?.[c.id]?`<span class="carrier-mark carrier-logo" data-brand="${e(c.id)}"><img src="${e(window.BRAND_ASSETS[c.id].file)}" alt="${e(c.name)} logosu" width="90" height="44"></span>`:`<span class="carrier-mark" style="--brand:${c.color}" title="Doğrulanmış logo bulunamadı">${e(c.mark)}</span>`;
+function mark(carrier) {
+ const logo = window.BRAND_ASSETS?.[carrier.id];
+ return `<span class="carrier-mark${logo ? ' carrier-logo' : ''}" style="--brand:${carrier.color}" data-brand="${e(carrier.id)}" aria-hidden="true">
+  <span class="carrier-initials">${e(carrier.mark)}</span>
+  ${logo ? `<img src="${e(logo.file)}" alt="" width="52" height="30" decoding="async">` : ''}
+ </span>`;
+}
+// Keep the initials in place until a bundled logo has actually loaded.
+document.addEventListener('load', event => {
+ const image = event.target;
+ if (image instanceof HTMLImageElement && image.parentElement?.classList.contains('carrier-logo') && image.naturalWidth > 0) {
+  image.parentElement.classList.add('logo-loaded');
+ }
+}, true);
 function shipmentDelivered(s){return s.status==='delivered'||(window.liveCache?.[s.id]?.identity===[s.carrier,s.number,s.postalCode||'',s.phoneLast4||''].join('|')&&window.liveCache[s.id].status==='Delivered');}
 function toast(text) { const t=document.querySelector('#toast'); t.textContent=text; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3300); }
 const parcelArt = `<svg class="empty-art" viewBox="0 0 120 104" aria-hidden="true"><ellipse cx="60" cy="91" rx="44" ry="7" fill="#edf2e4" stroke="none"/><path d="M23 36 60 17l37 19v40L60 96 23 76Z" fill="#e5eecf" stroke="#a9bc8e"/><path d="m23 36 37 20 37-20M60 56v40M42 26l37 20v16" stroke="#89a875"/><path d="m29 15-4-6m69 11 7-3M12 57H5" stroke="#d4a36b"/><circle cx="103" cy="67" r="4" fill="#f5cc9b" stroke="none"/></svg>`;
@@ -90,7 +103,7 @@ function settingsPage() { return `<section class="page-heading"><h1>Tamamen seni
  <section class="settings-card"><h3>${icon('download')} Yedekle ve geri yükle</h3><p>${state.shipments.length} gönderi · ${state.custom.length} özel firma. Kayıtlarını JSON dosyasına aktar; başka bir cihazda geri yükle. Yedek dosyası takip numaralarını içerir.</p><div class="settings-actions"><button class="btn secondary" data-action="export">${icon('download')} Dışa aktar</button><button class="btn ghost" data-action="import">${icon('upload')} İçe aktar</button></div></section>
  <section class="settings-card"><h3>${icon('info')} Takip nasıl çalışır?</h3><p>“Sorgula” butonu takip numaranı panoya kopyalar ve firmanın resmî sitesini tarayıcında açar. Numaranı yapıştırıp, istenirse güvenlik kodunu girerek güncel durumu öğrenirsin. Firma bilinmiyorsa 17TRACK kullanılabilir.</p><p>Uygulama taşıyıcılardan otomatik veri çekmez ve bildirim göndermez. “Kaydedildi” bir kargo hareketi değildir; teslim işaretini sen belirlersin. Gerçek durum, konum ve teslimat tahmini firmanın sayfasındadır.</p></section>
  <section class="settings-card"><h3>${icon('globe')} Firma kapsamı</h3><p>Türkiye ve dünyadan ${CARRIERS.length-1} firma bağlantısı, 17TRACK seçeneği ve özel firma ekleme. MNG gönderileri DHL eCommerce, Sendeo gönderileri Kolay Gelsin adı altında listelenir. Her firmanın veya numaranın sorgulanabilmesi garanti edilemez; site hizmetleri değişebilir.</p><button class="btn ghost" data-action="nav" data-id="carriers">Firma rehberini aç ${icon('arrow')}</button></section>
- <div class="version"><b>KargoPilot 1.1.0</b><br>Bağımsız bir gönderi düzenleyicisi.<br>Taşıyıcı firmalarla resmî bir bağlantısı yoktur.</div>`; }
+ <div class="version"><b>KargoPilot 1.1.1</b><br>Bağımsız bir gönderi düzenleyicisi.<br>Taşıyıcı firmalarla resmî bir bağlantısı yoktur.</div>`; }
 
 function showSheet(content) {
  if(!modalRoot.firstChild) focusReturn=document.activeElement;
@@ -142,7 +155,18 @@ function openDetail(id) {
 }
 async function copyNumber(number) {try {if(window.Native)Native.copy(number);else await navigator.clipboard.writeText(number);return true;}catch{toast('Kopyalama yapılamadı. Numaranı elle kopyalayabilirsin.');return false;}}
 function trackURL(s) {const c=carrierById(s.carrier);return c.url.replaceAll('{num}',encodeURIComponent(s.number));}
-async function trackShipment(id) {const s=shipmentById(id);if(!s)return;await copyNumber(s.number);openURL(trackURL(s));toast('Numaranı açılan takip sayfasına yapıştır.');}
+async function trackShipment(id) {
+ const shipment = shipmentById(id);
+ if (!shipment) return;
+ const isPrefilled = carrierById(shipment.carrier).url.includes('{num}');
+ if (!isPrefilled && await copyNumber(shipment.number)) toast('Takip numaran panoya kopyalandı.');
+ openTrackingURL(trackURL(shipment));
+}
+function openTrackingURL(url) {
+ if (!validURL(url)) return;
+ if (window.Native && typeof Native.openTracking === 'function') Native.openTracking(url);
+ else openURL(url);
+}
 function openURL(url) {if(!validURL(url))return;if(window.Native)Native.open(url);else window.open(url,'_blank','noopener,noreferrer');}
 function patchShipment(id,patch) {if(commit({...state,shipments:state.shipments.map(s=>s.id===id?{...s,...patch}:s)})){render();openDetail(id);}}
 function confirmDialog(title,body,yes,onYes,back) {modal={type:'confirm',onYes,back};showSheet(`${sheetHead(title)}<p class="dialog-copy">${e(body)}</p><div class="form-buttons"><button class="btn ghost" data-action="cancel">Vazgeç</button><button class="btn danger" data-action="confirm">${e(yes)}</button></div>`);}
