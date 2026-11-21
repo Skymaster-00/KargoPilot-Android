@@ -1,6 +1,6 @@
-KargoPilot 1.0.1 — imzalı Android APK.
+KargoPilot 1.0.2 — imzalı Android APK.
 
-Bu sürümde GitHub yayımlama ortamı düzeltildi, Netlog ve CEVA / Borusan bağlantıları güncellendi. Kargomsende’nin güncel resmî adresi doğrulanamadığı için bu seçim açıkça belirtilen 17TRACK alternatifini kullanır; sonuç bulunamayabilir. SMS ile gelen güncel bağlantı özel firma olarak eklenebilir.
+Bu sürümde GitHub yayımlama ortamının SDK kurulumu düzeltildi. Netlog ve CEVA / Borusan bağlantıları günceldir. Kargomsende’nin güncel resmî adresi doğrulanamadığı için bu seçim açıkça belirtilen 17TRACK alternatifini kullanır; sonuç bulunamayabilir. SMS ile gelen güncel bağlantı özel firma olarak eklenebilir.
 
 - 35 firma bağlantısı, 17TRACK sorgulaması ve listede olmayan firmalar için özel bağlantı ekleme.
 - Takip numarası kaydetme, kopyalama ve firmanın resmî sayfasında sorgulama.

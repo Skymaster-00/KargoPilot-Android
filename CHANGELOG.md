@@ -1,5 +1,9 @@
 # Değişiklikler
 
+## 1.0.2 — 2026-11-21
+
+- GitHub Android SDK kurulumu artık kaldırılan eski `tools` paketini istemiyor; yalnızca gerekli platform araçlarını kuruyor.
+
 ## 1.0.1 — 2026-11-21
 
 - GitHub derleme ortamı, Playwright ile uyumlu Ubuntu 24.04 sürümüne sabitlendi.
