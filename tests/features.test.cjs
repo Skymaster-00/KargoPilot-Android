@@ -36,6 +36,7 @@ const seed={version:1,shipments:[{id:'test-live',carrier:'kolay',number:'TEST000
  await page.getByRole('button',{name:'Koyu',exact:true}).click();
  assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
  await page.reload();assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
+ await page.screenshot({path:path.join(out,'09-dark-home.png')});
  await page.getByRole('button',{name:'Ayarlar',exact:true}).click();
  await page.screenshot({path:path.join(out,'05-dark-settings.png')});
  await page.getByRole('button',{name:'Dışa aktar',exact:true}).click();

@@ -127,10 +127,10 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void notificationSettings(){runOnUiThread(()->{Intent intent=new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName()));startActivity(intent);});}
         @JavascriptInterface public void theme(boolean dark) {
             runOnUiThread(() -> {
-                int background = dark ? 0xFF141518 : 0xFFF6F7F3;
+                int background = dark ? 0xFF181A19 : 0xFFF6F7F3;
                 web.setBackgroundColor(background);
                 getWindow().setStatusBarColor(background);
-                getWindow().setNavigationBarColor(dark ? 0xFF1D1F24 : Build.VERSION.SDK_INT >= 27 ? Color.WHITE : 0xFF124E40);
+                getWindow().setNavigationBarColor(dark ? 0xFF212422 : Build.VERSION.SDK_INT >= 27 ? Color.WHITE : 0xFF124E40);
                 int flags = dark ? 0 : View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
                 if (!dark && Build.VERSION.SDK_INT >= 27) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
                 getWindow().getDecorView().setSystemUiVisibility(flags);

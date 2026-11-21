@@ -1,5 +1,9 @@
 # Değişiklikler
 
+## 1.1.2
+
+- Önceki koyu tema görünümü geri geldi. Arka plan ve kartlarda füme tonları, paket çiziminde ve ana düğmelerde daha yumuşak yeşil kullanıldı.
+
 ## 1.1.1
 
 - Firma logoları küçük ve sabit kutulara sığdırıldı. Yüklenmeyen görsellerde firma kısaltması gösteriliyor.
