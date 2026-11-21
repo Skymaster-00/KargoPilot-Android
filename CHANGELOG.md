@@ -1,5 +1,11 @@
 # Değişiklikler
 
+## 1.0.1 — 2026-11-21
+
+- GitHub derleme ortamı, Playwright ile uyumlu Ubuntu 24.04 sürümüne sabitlendi.
+- Netlog ve CEVA / Borusan resmî bağlantıları güncellendi.
+- Güncel resmî adresi doğrulanamayan Kargomsende için açıkça belirtilen 17TRACK alternatifi kullanıldı; sonuç garantisi verilmez.
+
 ## 1.0.0 — 2026-11-21
 
 - Türkçe, çevrimdışı çalışan gönderi düzenleme arayüzü.

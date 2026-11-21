@@ -22,7 +22,9 @@ Bu APK kargo firmalarından otomatik veri çekmez. **Kaydedildi**, bir taşıma 
 3. Açılan resmî sayfaya kopyalanmış numarayı yapıştır, gerekiyorsa güvenlik kodunu gir.
 4. Teslim aldığında gönderiyi elle işaretle veya arşivle.
 
-35 firma: Yurtiçi, Aras, DHL eCommerce / MNG, Sürat, PTT, HepsiJET, Trendyol Express, Kolay Gelsin / Sendeo, Kargoist, Kargomsende, AGT, Kuryenet, Bir Günde, Horoz, Borusan, Netlog, Fillo, UPS, FedEx, DHL Express, TNT, USPS, Royal Mail, DPD, GLS, La Poste, Poste Italiane, PostNL, bpost, Canada Post, Australia Post, Swiss Post, Cainiao, YunExpress ve SF Express.
+35 firma seçeneği: Yurtiçi, Aras, DHL eCommerce / MNG, Sürat, PTT, HepsiJET, Trendyol Express, Kolay Gelsin / Sendeo, Kargoist, Kargomsende, AGT, Kuryenet, Bir Günde, Horoz, CEVA / Borusan, Netlog, Fillo, UPS, FedEx, DHL Express, TNT, USPS, Royal Mail, DPD, GLS, La Poste, Poste Italiane, PostNL, bpost, Canada Post, Australia Post, Swiss Post, Cainiao, YunExpress ve SF Express.
+
+Kargomsende’nin güncel resmî adresi doğrulanamadığından bu seçim 17TRACK alternatifini açar; gönderiye ait sonuç bulunamayabilir. Satıcının/SMS’in verdiği güncel takip bağlantısı özel firma olarak eklenebilir. CEVA / Borusan için [güncel CEVA takip portalı](https://www.cevalogistics.com/en/ceva-trak), Netlog için [firmanın güncel sitesi](https://www.netloglogistics.com/) kullanılır.
 
 Android 6.0+ ve güncel Android System WebView gerekir. APK’yı telefonda açıp kuruluma izin verin. Uygulamayı silmek cihaz kayıtlarını da siler; önce Ayarlar’dan yedek alın. JSON yedekleri takip numaralarını içerir.
 
